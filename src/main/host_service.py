@@ -16,22 +16,20 @@ async def get_content_types(hosts: List) -> List[Tuple[str, str, str]]:
     host_types: List[Tuple[str, str, str]] = list()
 
     async def load_content_types(host: str):
-        # print(f"Task with host: {host}...")
         async with aiohttp.ClientSession(conn_timeout=5) as session:
             response = None
             try:
                 # Пробуем установить https-соединиение
-                async with session.get("https://" + host) as https_resp:
-                    response = https_resp
+                async with session.get("https://" + host) as resp:
+                    response = resp
             except BaseException as e:
-                print("Ошибка в https блоке:", e)
                 try:
                     # При неуспешном https, открываем http-соединение
-                    async with session.get("http://" + host) as http_resp:
-                        response = http_resp
+                    async with session.get("http://" + host) as resp:
+                        response = resp
                 except BaseException as e:
                     # Не установилось соединение по https и http. Считаем хост техническим
-                    print("Ошибка в http блоке:", e)
+                    print("Не удалось установить соединение по https и http:", e)
 
             status: str = ""
             content_type: str = ""
@@ -62,7 +60,7 @@ def write_data(
         host_content_types: List[Tuple[str, str, str]]
 ) -> None:
     # Запишем всю информацию в файл
-    with open(file_path, 'w', encoding='utf-8', newline='') as outfile:
+    with open(file_path, 'a', encoding='utf-8', newline='') as outfile:
         writer = csv.writer(outfile)
         for host, status, content_type in host_content_types:
             writer.writerow((host, status, content_type))
