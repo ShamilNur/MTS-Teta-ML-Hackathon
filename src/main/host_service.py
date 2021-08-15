@@ -12,11 +12,11 @@ def get_hosts_list(hosts_path: str) -> List[str]:
         return [line.strip() for line in infile.readlines()]
 
 
-async def get_content_types(hosts: List) -> List[Tuple[str, str, str]]:
+async def get_content_types(hosts: List[str]) -> List[Tuple[str, str, str]]:
     host_types: List[Tuple[str, str, str]] = list()
 
     async def load_content_types(host: str):
-        async with aiohttp.ClientSession(conn_timeout=5) as session:
+        async with aiohttp.ClientSession(conn_timeout=10) as session:
             response = None
             try:
                 # Пробуем установить https-соединиение
